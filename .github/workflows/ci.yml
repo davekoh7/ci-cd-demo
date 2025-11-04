@@ -1,0 +1,22 @@
+name: Simple CI/CD Demo
+
+on:
+  push:              # Run when you push code
+    branches: [ main ]
+  pull_request:      # Also run when PRs are made
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Run the script
+        run: python hello.py

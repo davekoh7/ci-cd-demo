@@ -9,7 +9,44 @@ permissions:
   pages: write
   id-token: write
 
+concurrency:name: Deploy to GitHub Pages  # Name of the workflow
+
+on:
+  push:
+    branches: [ main ]         # Trigger workflow whenever main is updated
+
+permissions:
+  contents: read               # Allows workflow to read the repo
+  pages: write                 # Allows workflow to deploy to GitHub Pages
+  id-token: write              # Needed for some security tokens
+
 concurrency:
+  group: "pages"
+  cancel-in-progress: true     # Prevent multiple deployments at the same time
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest     # Runs the job on a virtual Linux machine
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4   # Step 1: Pulls your repository files into the runner
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5  # Step 2: Prepares GitHub Pages deployment
+
+      - name: Upload site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .  # Step 3: Tells GitHub “everything in this repo is ready to deploy”
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4     # Step 4: Actually pushes the files to GitHub Pages
+
   group: "pages"
   cancel-in-progress: true
 
